@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Получка">
+    <title>Получка — Персональный органайзер сменщика (PWA Web)</title>
+
+    <style>
+        :root {
+            --sage-primary: #2D4F32;
+            --sage-dark-green: #2E7D32;
+            --sage-bg: #E8EFEA;
+            --sage-card-bg: #FFFFFF;
+            --sage-card-stroke: rgba(0, 0, 0, 0.12);
+            --sage-text: #222222;
+            --sage-subtext: #666666;
+            --radius-card: 20px;
+            --radius-btn: 14px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--sage-bg);
+            color: var(--sage-text);
+            padding-bottom: 40px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            padding: 16px;
+        }
+
+        /* Header Logo & Title */
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            margin-top: 10px;
+        }
+
+        .brand-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--sage-primary);
+        }
+
+        .brand-subtitle {
+            font-size: 12px;
+            color: var(--sage-subtext);
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--sage-card-bg);
+            border-radius: var(--radius-card);
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1.5px solid var(--sage-card-stroke);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .dashboard-card {
+            background: linear-gradient(135deg, #1B301E 0%, #2D4F32 100%);
+            color: white;
+            border: none;
+        }
+
+        .dashboard-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.8;
+            font-weight: 700;
+        }
+
+        .dashboard-total {
+            font-size: 36px;
+            font-weight: 800;
+            margin: 4px 0 10px 0;
+            color: #A9DFBF;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .dashboard-stat-box {
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            padding: 8px 10px;
+        }
+
+        .dashboard-stat-val {
+            font-size: 15px;
+            font-weight: 800;
+            margin-top: 2px;
+        }
+
+        .badge-ktu-good { color: #A9DFBF; }
+        .badge-ktu-warn { color: #FFE082; }
+        .badge-ktu-bad  { color: #FF8A80; }
+
+        /* Form Inputs */
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--sage-primary);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .input-text {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1.5px solid #D0DCD2;
+            background: #F8FAF8;
+            font-size: 15px;
+            font-weight: 600;
+            color: #222;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-text:focus {
+            border-color: var(--sage-primary);
+            background: white;
+        }
+
+        .row-grid {
+            display: flex;
+            gap: 10px;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .checkbox-row input {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--sage-primary);
+        }
+
+        /* Volumetric 3D Buttons */
+        .btn-3d {
+            width: 100%;
+            padding: 16px;
+            border-radius: var(--radius-btn);
+            border: none;
+            background: var(--sage-primary);
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #1A3320, 0 8px 15px rgba(0,0,0,0.15);
+            transition: transform 0.08s ease, box-shadow 0.08s ease;
+            text-align: center;
+            display: inline-block;
+            user-select: none;
+        }
+
+        .btn-3d:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #1A3320, 0 3px 8px rgba(0,0,0,0.15);
+        }
+
+        .btn-secondary {
+            background: #E8F5E9;
+            color: var(--sage-primary);
+            box-shadow: 0 4px 0 #A5D6A7;
+            border: 1px solid #A5D6A7;
+        }
+
+        .btn-secondary:active {
+            box-shadow: 0 1px 0 #A5D6A7;
+        }
+
+        /* Tab Navigation */
+        .tab-bar {
+            display: flex;
+            background: white;
+            border-radius: 16px;
+            padding: 4px;
+            margin-bottom: 16px;
+            border: 1px solid #D0DCD2;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 4px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            color: var(--sage-subtext);
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: var(--sage-primary);
+            color: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        /* Shift List Items */
+        .shift-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #F4F6F4;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid #E0E8E1;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .shift-item:active {
+            background: #E8F5E9;
+        }
+
+        .shift-date {
+            font-weight: 800;
+            font-size: 15px;
+            color: var(--sage-primary);
+        }
+
+        .shift-details {
+            font-size: 12px;
+            color: #555;
+            margin-top: 3px;
+        }
+
+        .shift-salary {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--sage-dark-green);
+        }
+
+        /* High-Contrast Vibrant Badges */
+        .badge-type {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            margin-left: 6px;
+            letter-spacing: 0.2px;
+        }
+
+        .badge-day {
+            background: #FEF3C7;
+            color: #B45309;
+            border: 1px solid #FCD34D;
+            box-shadow: 0 1px 3px rgba(180, 83, 9, 0.12);
+        }
+
+        .badge-night {
+            background: #E0E7FF;
+            color: #1E3A8A;
+            border: 1px solid #A5B4FC;
+            box-shadow: 0 1px 3px rgba(30, 58, 138, 0.12);
+        }
+
+        .badge-off {
+            background: #F3F4F6;
+            color: #6B7280;
+            border: 1px solid #E5E7EB;
+        }
+
+        /* Month Accordion Header Card */
+        .month-header-card {
+            background: #E8F5E9;
+            border: 1.5px solid #A5D6A7;
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-top: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        .month-header-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--sage-primary);
+            text-transform: uppercase;
+        }
+
+        .month-header-sub {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--sage-dark-green);
+            margin-top: 2px;
+        }
+
+        .month-shifts-group {
+            padding-left: 4px;
+        }
+
+        /* Calendar Month Schedule Styles (Android Style) */
+        .calendar-month-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .calendar-month-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--sage-primary);
+            text-transform: uppercase;
+        }
+
+        .calendar-nav-btn {
+            background: #E8F5E9;
+            border: 1px solid #A5D6A7;
+            border-radius: 10px;
+            padding: 6px 14px;
+            font-weight: 800;
+            font-size: 16px;
+            color: var(--sage-primary);
+            cursor: pointer;
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--sage-subtext);
+            margin-bottom: 8px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .calendar-day-cell {
+            background: #F8FAF8;
+            border: 1px solid #E0E8E1;
+            border-radius: 12px;
+            padding: 6px 2px;
+            min-height: 54px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.1s;
+        }
+
+        .calendar-day-cell:active {
+            transform: scale(0.95);
+        }
+
+        .calendar-day-cell.empty {
+            background: transparent;
+            border: none;
+            cursor: default;
+        }
+
+        .calendar-day-cell.today {
+            border: 2.5px solid var(--sage-primary);
+            background: #E8F5E9;
+            box-shadow: 0 3px 10px rgba(45, 79, 50, 0.2);
+        }
+
+        /* Glowing Green LED Indicator for saved shifts */
+        .led-dot-green {
+            width: 7px;
+            height: 7px;
+            background-color: #00E676;
+            border-radius: 50%;
+            box-shadow: 0 0 6px #00E676, 0 0 2px #00C853;
+            display: inline-block;
+            position: absolute;
+            top: 4px;
+            right: 4px;
+        }
+
+        /* Side Job Highlight on Calendar Cell */
+        .side-job-cell {
+            background: #F0FDF4;
+            border: 1.5px solid #2E7D32;
+        }
+
+        .side-job-tag {
+            font-size: 8px;
+            font-weight: 800;
+            color: #2E7D32;
+            background: #DCFCE7;
+            padding: 1px 3px;
+            border-radius: 4px;
+            line-height: 1;
+        }
+
+        .calendar-day-num {
+            font-size: 12px;
+            font-weight: 800;
+            color: #333;
+        }
+
+        .calendar-day-cell.today .calendar-day-num {
+            color: var(--sage-primary);
+        }
+
+        .calendar-day-badge {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 2px;
+            border-radius: 5px;
+            width: 95%;
+            text-align: center;
+        }
+
+        /* Modal Overlay */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .ios-pwa-banner {
+            background: #FFF3CD;
+            color: #856404;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-bottom: 16px;
+            text-align: center;
+            border: 1px solid #FFEEBA;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <div class="ios-pwa-banner" id="pwaBanner">
+            📲 <b>Для сохранения на iPhone:</b> нажмите на значок «Поделиться» в Safari и выберите <b>«На экран "Домой"»</b>.
+        </div>
+
+        <div class="app-header">
+            <div>
+                <div class="brand-title">ПОЛУЧКА</div>
+                <div class="brand-subtitle">Органайзер сменщика • Версия Web/iOS</div>
+            </div>
+            <div style="font-size: 28px; color: #FFD700;">☭</div>
+        </div>
+
+        <!-- Накопительный Дашборд -->
+        <div class="card dashboard-card">
+            <div class="dashboard-label">Доход за текущий месяц</div>
+            <div class="dashboard-total" id="dashTotal">0 ₽</div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-stat-box">
+                    <div style="opacity: 0.8; font-size: 10px; font-weight: 700;">СМЕНЫ</div>
+                    <div class="dashboard-stat-val" id="dashShiftsCount">0 отраб.</div>
+                </div>
+                <div class="dashboard-stat-box">
+                    <div style="opacity: 0.8; font-size: 10px; font-weight: 700;">СРЕДНЕЕ КТУ</div>
+                    <div class="dashboard-stat-val badge-ktu-good" id="dashKtuAvg">100%</div>
+                </div>
+            </div>
+
+            <div id="dashNextShift" style="margin-top: 10px; font-size: 13px; font-weight: 700; color: #FFE082; text-align: center;"></div>
+        </div>
+
+        <!-- Навигация Вкладок -->
+        <div class="tab-bar">
+            <div class="tab-btn active" onclick="switchTab('tabShift')">➕ Смена</div>
+            <div class="tab-btn" onclick="switchTab('tabReport')">📊 Отчет</div>
+            <div class="tab-btn" onclick="switchTab('tabSchedule')">📅 График</div>
+            <div class="tab-btn" onclick="switchTab('tabImport')">📥 Импорт</div>
+        </div>
+
+        <!-- Вкладка 1: Ввод и Редактирование Смены -->
+        <div id="tabShift">
+            <div class="card">
+                <div class="form-group">
+                    <label class="form-label" for="shiftDate">Дата смены (Нажмите для выбора из календаря)</label>
+                    <input type="date" id="shiftDate" class="input-text">
+                </div>
+
+                <div class="row-grid">
+                    <div class="col form-group">
+                        <label class="form-label" for="shiftKfrazr">Коэф. разряда (КР)</label>
+                        <input type="number" id="shiftKfrazr" class="input-text" value="1.3" step="0.1">
+                    </div>
+                    <div class="col form-group">
+                        <label class="form-label" for="shiftStavlin">Ставка линии (₽)</label>
+                        <input type="number" id="shiftStavlin" class="input-text" value="3000" step="100">
+                    </div>
+                </div>
+
+                <div class="row-grid">
+                    <div class="col form-group">
+                        <label class="form-label" for="shiftPlan">План выработки</label>
+                        <input type="number" id="shiftPlan" class="input-text" value="60000">
+                    </div>
+                    <div class="col form-group">
+                        <label class="form-label" for="shiftFact">Факт выработки</label>
+                        <input type="number" id="shiftFact" class="input-text" value="58000">
+                    </div>
+                </div>
+
+                <label class="checkbox-row">
+                    <input type="checkbox" id="cbFlpodr">
+                    <span>💼 Подработка (+30%)</span>
+                </label>
+
+                <div class="form-group" style="margin-top: 10px;">
+                    <label class="form-label" for="shiftComment">Комментарий</label>
+                    <input type="text" id="shiftComment" class="input-text" placeholder="Заметка к смене...">
+                </div>
+
+                <button class="btn-3d" id="btnSaveShift" style="margin-top: 10px;" onclick="saveShiftFromUi()">Рассчитать и сохранить</button>
+            </div>
+        </div>
+
+        <!-- Вкладка 2: Отчет и История смен (Аккордеон по месяцам) -->
+        <div id="tabReport" style="display: none;">
+            <div class="card">
+                <b style="color: var(--sage-primary); display: block; margin-bottom: 8px;">История смен</b>
+                <div id="shiftListContainer"></div>
+            </div>
+        </div>
+
+        <!-- Вкладка 3: Календарный График Смен (Android Style) -->
+        <div id="tabSchedule" style="display: none;">
+            <!-- Переключение месяцев -->
+            <div class="card" style="padding: 16px;">
+                <div class="calendar-month-bar">
+                    <button class="calendar-nav-btn" onclick="changeScheduleMonth(-1)">◀</button>
+                    <div class="calendar-month-title" id="calendarMonthTitle">СЕНТЯБРЬ 2026</div>
+                    <button class="calendar-nav-btn" onclick="changeScheduleMonth(1)">▶</button>
+                </div>
+
+                <div id="scheduleMonthSummary" style="font-size: 12px; text-align: center; color: var(--sage-dark-green); font-weight: 700; margin-bottom: 12px;"></div>
+
+                <!-- Дни недели -->
+                <div class="calendar-weekdays">
+                    <div>ПН</div><div>ВТ</div><div>СР</div><div>ЧТ</div><div>ПТ</div><div>СБ</div><div>ВС</div>
+                </div>
+
+                <!-- Календарная сетка -->
+                <div class="calendar-grid" id="calendarGridContainer"></div>
+            </div>
+
+            <!-- Панель настройки цикличности -->
+            <div class="card">
+                <b style="color: var(--sage-primary); font-size: 15px;">⚙️ Настройки вашего цикла смен</b>
+                <div style="font-size: 12px; color: #666; margin-bottom: 12px; margin-top: 2px;">Задайте последовательность смен и дату старта:</div>
+
+                <div class="form-group">
+                    <label class="form-label" for="schedulePattern">Последовательность цикла (через запятую)</label>
+                    <input type="text" id="schedulePattern" class="input-text" value="Д, Н, В, В" placeholder="Например: Д, Н, В, В">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="scheduleStartDate">Дата начала цикла (1-я смена)</label>
+                    <input type="text" id="scheduleStartDate" class="input-text" value="01.09.2026" placeholder="ДД.ММ.ГГГГ">
+                </div>
+
+                <button class="btn-3d btn-secondary" onclick="saveScheduleSettings()">💾 Применить настройки цикла</button>
+            </div>
+        </div>
+
+        <!-- Вкладка 4: Импорт файлов и Бэкап -->
+        <div id="tabImport" style="display: none;">
+            <div class="card">
+                <b style="color: var(--sage-primary); font-size: 16px;">📥 Загрузка и Парсер</b>
+                <div style="font-size: 12px; color: #666; margin-bottom: 14px;">Выберите файлы расчеток (.txt, .xlsx, .docx, .zpvyp) или фото:</div>
+
+                <input type="file" id="fileImporter" style="display: none;" onchange="handleFileSelected(this)" accept=".txt,.xlsx,.csv,.docx,.zpvyp,image/*">
+                <button class="btn-3d btn-secondary" onclick="document.getElementById('fileImporter').click()">📂 Выбрать файл или фото</button>
+
+                <div id="importStatus" style="margin-top: 14px; font-size: 13px; color: var(--sage-dark-green); font-weight: 700;"></div>
+            </div>
+
+            <div class="card">
+                <b style="color: var(--sage-primary); font-size: 16px;">💾 Резервное копирование</b>
+                <div style="font-size: 12px; color: #666; margin-bottom: 14px;">Сохраните копию базы смен в файлы iPhone для переноса на новый телефон:</div>
+
+                <button class="btn-3d btn-secondary" style="margin-bottom: 10px;" onclick="exportFullBackup()">💾 Сохранить резервную копию базы</button>
+
+                <input type="file" id="restoreImporter" style="display: none;" onchange="restoreFullBackup(this)" accept=".json,.zpvyp">
+                <button class="btn-3d btn-secondary" style="border-color: #D32F2F; color: #D32F2F;" onclick="document.getElementById('restoreImporter').click()">📥 Восстановить базу из файла</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Модальное окно получения смен (Мульти-импорт .zpvyp) -->
+    <div class="modal" id="importModal">
+        <div class="modal-content">
+            <b style="font-size: 18px; color: var(--sage-primary);" id="modalTitle">📥 Получено смен: 0</b>
+            <div style="font-size: 12px; color: #666; margin-bottom: 14px;">Выберите смены для сохранения в вашу базу:</div>
+
+            <div id="modalShiftList" style="max-height: 240px; overflow-y: auto; margin-bottom: 16px;"></div>
+
+            <button class="btn-3d" onclick="saveSelectedModalShifts()">Сохранить выбранные</button>
+            <button class="btn-3d btn-secondary" style="margin-top: 8px;" onclick="closeModal()">Отмена</button>
+        </div>
+    </div>
+
+    <script>
+        let shifts = JSON.parse(localStorage.getItem("zpvyp_shifts") || "[]");
+        let schedulePattern = localStorage.getItem("zpvyp_pattern") || "Д, Н, В, В";
+        let scheduleStartDate = localStorage.getItem("zpvyp_start_date") || "01.09.2026";
+        let currentCalendarDate = new Date();
+        let expandedMonthKeys = {};
+        let editingShiftId = null;
+        let receivedModalShifts = [];
+        let lastPlannedShiftsCount = 0;
+
+        const TAB_ORDER = ['tabShift', 'tabReport', 'tabSchedule', 'tabImport'];
+
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchEndX = 0;
+        let touchEndY = 0;
+
+        document.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
+        }, { passive: true });
+
+        document.addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            touchEndY = e.changedTouches[0].screenY;
+            handleGestureSwipe();
+        }, { passive: true });
+
+        function handleGestureSwipe() {
+            const deltaX = touchEndX - touchStartX;
+            const deltaY = touchEndY - touchStartY;
+
+            if (Math.abs(deltaX) > 60 && Math.abs(deltaX) > Math.abs(deltaY) * 1.8) {
+                const activeTabBtn = document.querySelector('.tab-btn.active');
+                let currentTabId = 'tabShift';
+                if (activeTabBtn) {
+                    const onclickAttr = activeTabBtn.getAttribute('onclick');
+                    if (onclickAttr && onclickAttr.includes('tabReport')) currentTabId = 'tabReport';
+                    else if (onclickAttr && onclickAttr.includes('tabSchedule')) currentTabId = 'tabSchedule';
+                    else if (onclickAttr && onclickAttr.includes('tabImport')) currentTabId = 'tabImport';
+                }
+
+                let currentIdx = TAB_ORDER.indexOf(currentTabId);
+                if (currentIdx === -1) currentIdx = 0;
+
+                if (deltaX < 0) {
+                    if (currentIdx < TAB_ORDER.length - 1) {
+                        switchTab(TAB_ORDER[currentIdx + 1]);
+                    }
+                } else {
+                    if (currentIdx > 0) {
+                        switchTab(TAB_ORDER[currentIdx - 1]);
+                    }
+                }
+            }
+        }
+
+        if (navigator.storage && navigator.storage.persist) {
+            navigator.storage.persist().then(granted => {
+                if (granted) console.log("iOS Storage Persistence Enabled!");
+            });
+        }
+
+        document.getElementById("shiftDate").value = formatIsoDate(new Date());
+        document.getElementById("schedulePattern").value = schedulePattern;
+        document.getElementById("scheduleStartDate").value = scheduleStartDate;
+
+        function formatDate(d) {
+            let day = String(d.getDate()).padStart(2, '0');
+            let month = String(d.getMonth() + 1).padStart(2, '0');
+            return `${day}.${month}.${d.getFullYear()}`;
+        }
+
+        function formatIsoDate(d) {
+            let day = String(d.getDate()).padStart(2, '0');
+            let month = String(d.getMonth() + 1).padStart(2, '0');
+            return `${d.getFullYear()}-${month}-${day}`;
+        }
+
+        function isoToRussian(isoStr) {
+            if (!isoStr) return formatDate(new Date());
+            const parts = isoStr.split("-");
+            if (parts.length === 3) {
+                return `${parts[2]}.${parts[1]}.${parts[0]}`;
+            }
+            return isoStr;
+        }
+
+        function russianToIso(ruStr) {
+            if (!ruStr) return formatIsoDate(new Date());
+            const parts = ruStr.split(".");
+            if (parts.length === 3) {
+                return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+            }
+            return formatIsoDate(new Date());
+        }
+
+        function parseDate(str) {
+            const parts = str.split(".");
+            if (parts.length === 3) {
+                return new Date(parts[2], parts[1] - 1, parts[0]);
+            }
+            return new Date();
+        }
+
+        function getShiftTypeForDate(dateStr) {
+            const pattern = schedulePattern.split(",").map(s => s.trim()).filter(s => s.length > 0);
+            if (pattern.length === 0) return "";
+            const startD = parseDate(scheduleStartDate);
+            const checkD = parseDate(dateStr);
+            const diffDays = Math.floor((checkD.getTime() - startD.getTime()) / 86400000);
+            let idx = diffDays % pattern.length;
+            if (idx < 0) idx += pattern.length;
+            return pattern[idx];
+        }
+
+        function isNightShift(s) {
+            return (getShiftTypeForDate(s.date) === "Н");
+        }
+
+        function switchTab(tabId) {
+            ['tabShift', 'tabReport', 'tabSchedule', 'tabImport'].forEach(id => {
+                document.getElementById(id).style.display = (id === tabId) ? 'block' : 'none';
+            });
+
+            const btns = document.querySelectorAll('.tab-btn');
+            btns.forEach((btn, idx) => {
+                btn.classList.toggle('active', ['tabShift', 'tabReport', 'tabSchedule', 'tabImport'][idx] === tabId);
+            });
+
+            if (tabId === 'tabReport') renderReport();
+            if (tabId === 'tabSchedule') renderScheduleCalendar();
+        }
+
+        function editShift(originalIdx) {
+            const s = shifts[originalIdx];
+            if (!s) return;
+
+            editingShiftId = s.id;
+            document.getElementById("shiftDate").value = russianToIso(s.date);
+            document.getElementById("shiftKfrazr").value = s.kfrazr;
+            document.getElementById("shiftStavlin").value = s.stavlin;
+            document.getElementById("shiftPlan").value = s.plan;
+            document.getElementById("shiftFact").value = s.fact;
+            document.getElementById("cbFlpodr").checked = s.flpodr;
+            document.getElementById("shiftComment").value = s.comment || "";
+
+            const saveBtn = document.getElementById("btnSaveShift");
+            if (saveBtn) saveBtn.innerText = "Обновить смену";
+
+            switchTab('tabShift');
+        }
+
+        function saveShiftFromUi() {
+            const rawIso = document.getElementById("shiftDate").value.trim();
+            const date = isoToRussian(rawIso);
+            const kfrazr = parseFloat(document.getElementById("shiftKfrazr").value) || 1.0;
+            const stavlin = parseFloat(document.getElementById("shiftStavlin").value) || 0.0;
+            const plan = parseFloat(document.getElementById("shiftPlan").value) || 1.0;
+            const fact = parseFloat(document.getElementById("shiftFact").value) || 0.0;
+            const flpodr = document.getElementById("cbFlpodr").checked;
+            const isNight = (getShiftTypeForDate(date) === "Н");
+            const comment = document.getElementById("shiftComment").value.trim();
+
+            const perf = (plan > 0) ? (fact / plan) : 0;
+            const effectivePerf = Math.max(0.8, perf);
+            let salary = stavlin * kfrazr * effectivePerf;
+            if (flpodr) salary *= 1.3;
+
+            const existingIdx = shifts.findIndex(s => s.date === date);
+
+            if (editingShiftId !== null) {
+                const editIdx = shifts.findIndex(s => s.id === editingShiftId);
+                if (editIdx !== -1) {
+                    shifts[editIdx] = {
+                        id: editingShiftId,
+                        date, kfrazr, stavlin, plan, fact, flpodr, isNight, salary, comment
+                    };
+                    alert("✅ Смена за " + date + " успешно обновлена!");
+                }
+                editingShiftId = null;
+                const saveBtn = document.getElementById("btnSaveShift");
+                if (saveBtn) saveBtn.innerText = "Рассчитать и сохранить";
+            } else if (existingIdx !== -1) {
+                shifts[existingIdx] = {
+                    id: shifts[existingIdx].id,
+                    date, kfrazr, stavlin, plan, fact, flpodr, isNight, salary, comment
+                };
+                alert("ℹ️ Смена за " + date + " уже существовала и была успешно обновлена!");
+            } else {
+                const newShift = {
+                    id: Date.now(),
+                    date, kfrazr, stavlin, plan, fact, flpodr, isNight, salary, comment
+                };
+                shifts.unshift(newShift);
+                alert("✅ Смена за " + date + " успешно сохранена!");
+            }
+
+            localStorage.setItem("zpvyp_shifts", JSON.stringify(shifts));
+            updateDashboard();
+            switchTab('tabReport');
+        }
+
+        function saveScheduleSettings() {
+            schedulePattern = document.getElementById("schedulePattern").value.trim();
+            scheduleStartDate = document.getElementById("scheduleStartDate").value.trim();
+
+            localStorage.setItem("zpvyp_pattern", schedulePattern);
+            localStorage.setItem("zpvyp_start_date", scheduleStartDate);
+
+            alert("💾 Настройки цикла смен сохранены!");
+            renderScheduleCalendar();
+            updateDashboard();
+        }
+
+        function changeScheduleMonth(delta) {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + delta);
+            renderScheduleCalendar();
+        }
+
+        function renderScheduleCalendar() {
+            const grid = document.getElementById("calendarGridContainer");
+            grid.innerHTML = "";
+
+            const pattern = schedulePattern.split(",").map(s => s.trim()).filter(s => s.length > 0);
+            const startD = parseDate(scheduleStartDate);
+
+            const year = currentCalendarDate.getFullYear();
+            const month = currentCalendarDate.getMonth();
+
+            const monthNames = ["ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ", "ИЮНЬ", "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"];
+            document.getElementById("calendarMonthTitle").innerText = `${monthNames[month]} ${year}`;
+
+            const firstDayOfMonth = new Date(year, month, 1);
+            let startDayOfWeek = firstDayOfMonth.getDay() - 1;
+            if (startDayOfWeek < 0) startDayOfWeek = 6;
+
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const today = new Date();
+            today.setHours(0,0,0,0);
+
+            for (let i = 0; i < startDayOfWeek; i++) {
+                const emptyCell = document.createElement("div");
+                emptyCell.className = "calendar-day-cell empty";
+                grid.appendChild(emptyCell);
+            }
+
+            let plannedShiftsCount = 0;
+            let plannedEstSalary = 0;
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const checkD = new Date(year, month, d);
+                const diffDays = Math.floor((checkD.getTime() - startD.getTime()) / 86400000);
+
+                let idx = diffDays % pattern.length;
+                if (idx < 0) idx += pattern.length;
+                const type = pattern[idx];
+
+                const dateStr = formatDate(checkD);
+                const actualShift = shifts.find(s => s.date === dateStr);
+                const isToday = (checkD.getTime() === today.getTime());
+                const isSideJob = actualShift && actualShift.flpodr;
+
+                if (type === 'Д' || type === 'Н') {
+                    plannedShiftsCount++;
+                    plannedEstSalary += actualShift ? actualShift.salary : 3900;
+                }
+
+                const cell = document.createElement("div");
+                cell.className = "calendar-day-cell" + (isToday ? " today" : "") + (isSideJob ? " side-job-cell" : "");
+
+                const badgeClass = (type === 'Д') ? 'badge-day' : (type === 'Н') ? 'badge-night' : 'badge-off';
+                const badgeText = (type === 'Д') ? '☀️ Д' : (type === 'Н') ? '🌙 Н' : '🌴 В';
+
+                const ledHtml = actualShift ? '<span class="led-dot-green" title="Смена зафиксирована"></span>' : '';
+                const sideJobHtml = isSideJob ? '<span class="side-job-tag">💼 Подр</span>' : '';
+
+                cell.innerHTML = `
+                    ${ledHtml}
+                    <div class="calendar-day-num">${d}</div>
+                    <span class="calendar-day-badge ${badgeClass}">${badgeText}</span>
+                    ${sideJobHtml}
+                `;
+
+                cell.onclick = function() {
+                    document.getElementById("shiftDate").value = russianToIso(dateStr);
+                    switchTab('tabShift');
+                };
+
+                grid.appendChild(cell);
+            }
+
+            lastPlannedShiftsCount = plannedShiftsCount;
+
+            document.getElementById("scheduleMonthSummary").innerText =
+                `Запланировано смен: ${plannedShiftsCount}   •   Оценка дохода: ${Math.round(plannedEstSalary).toLocaleString('ru-RU')} ₽`;
+
+            updateNextShiftBanner();
+        }
+
+        function updateNextShiftBanner() {
+            const pattern = schedulePattern.split(",").map(s => s.trim()).filter(s => s.length > 0);
+            if (pattern.length === 0) return;
+
+            const startD = parseDate(scheduleStartDate);
+            const today = new Date();
+            today.setHours(0,0,0,0);
+
+            const diffDays = Math.floor((today.getTime() - startD.getTime()) / 86400000);
+            let idx = diffDays % pattern.length;
+            if (idx < 0) idx += pattern.length;
+            const type = pattern[idx];
+
+            const nextBanner = document.getElementById("dashNextShift");
+            if (type === 'Д') {
+                nextBanner.innerText = "☀️ Сегодня: Дневная смена";
+            } else if (type === 'Н') {
+                nextBanner.innerText = "🌙 Сегодня: Ночная смена";
+            } else {
+                nextBanner.innerText = "🌴 Сегодня: Выходной день";
+            }
+        }
+
+        function updateDashboard() {
+            const today = new Date();
+            const currentMonthKey = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}`;
+
+            const currentMonthShifts = shifts.filter(s => {
+                const parts = s.date.split(".");
+                if (parts.length === 3) {
+                    const mKey = `${parts[2]}.${parts[1].padStart(2, '0')}`;
+                    return mKey === currentMonthKey;
+                }
+                return false;
+            });
+
+            const total = currentMonthShifts.reduce((acc, s) => acc + (s.salary || 0), 0);
+            document.getElementById("dashTotal").innerText = Math.round(total).toLocaleString('ru-RU') + " ₽";
+
+            let avgKtu = 100;
+            if (currentMonthShifts.length > 0) {
+                const sumKtu = currentMonthShifts.reduce((acc, s) => {
+                    const perf = (s.plan > 0) ? (s.fact / s.plan) * 100 : 100;
+                    return acc + perf;
+                }, 0);
+                avgKtu = Math.round(sumKtu / currentMonthShifts.length);
+            }
+
+            const ktuElem = document.getElementById("dashKtuAvg");
+            if (ktuElem) {
+                ktuElem.innerText = avgKtu + "%";
+                ktuElem.className = "dashboard-stat-val " + (avgKtu >= 95 ? "badge-ktu-good" : (avgKtu >= 90 ? "badge-ktu-warn" : "badge-ktu-bad"));
+            }
+
+            renderScheduleCalendar();
+
+            const plannedCount = lastPlannedShiftsCount || 0;
+            document.getElementById("dashShiftsCount").innerText = `${currentMonthShifts.length} отраб. / ${plannedCount} граф.`;
+        }
+
+        function renderReport() {
+            const container = document.getElementById("shiftListContainer");
+            container.innerHTML = "";
+
+            if (shifts.length === 0) {
+                container.innerHTML = "<div style='text-align: center; color: #888; padding: 20px;'>История смен пуста</div>";
+                return;
+            }
+
+            const monthNames = ["ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ", "ИЮНЬ", "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"];
+            const today = new Date();
+            const currentMonthKey = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}`;
+
+            const grouped = {};
+            shifts.forEach((s, originalIdx) => {
+                const parts = s.date.split(".");
+                let monthKey = "ВСЕ СМЕНЫ";
+                let monthTitle = "СМЕНЫ";
+                if (parts.length === 3) {
+                    monthKey = `${parts[2]}.${parts[1].padStart(2, '0')}`;
+                    const mIdx = parseInt(parts[1], 10) - 1;
+                    monthTitle = `${monthNames[mIdx]} ${parts[2]}`;
+                }
+                if (!grouped[monthKey]) {
+                    grouped[monthKey] = { key: monthKey, title: monthTitle, items: [] };
+                }
+                grouped[monthKey].items.push({ shift: s, originalIdx });
+            });
+
+            const sortedMonthKeys = Object.keys(grouped).sort().reverse();
+
+            sortedMonthKeys.forEach((monthKey, idx) => {
+                const group = grouped[monthKey];
+
+                if (expandedMonthKeys[monthKey] === undefined) {
+                    expandedMonthKeys[monthKey] = (monthKey === currentMonthKey || idx === 0);
+                }
+
+                group.items.sort((a, b) => {
+                    const dateA = parseDate(a.shift.date).getTime();
+                    const dateB = parseDate(b.shift.date).getTime();
+                    return dateB - dateA;
+                });
+
+                const isExpanded = expandedMonthKeys[monthKey];
+                const totalMonthSalary = group.items.reduce((acc, item) => acc + (item.shift.salary || 0), 0);
+
+                const headerCard = document.createElement("div");
+                headerCard.className = "month-header-card";
+                headerCard.innerHTML = `
+                    <div>
+                        <div class="month-header-title">${group.title}</div>
+                        <div class="month-header-sub">Итого: ${Math.round(totalMonthSalary).toLocaleString('ru-RU')} ₽ • Смен: ${group.items.length}</div>
+                    </div>
+                    <div style="font-size: 16px; color: var(--sage-primary); font-weight: 800;">
+                        ${isExpanded ? '▲' : '▼'}
+                    </div>
+                `;
+
+                headerCard.onclick = function() {
+                    expandedMonthKeys[monthKey] = !expandedMonthKeys[monthKey];
+                    renderReport();
+                };
+
+                container.appendChild(headerCard);
+
+                if (isExpanded) {
+                    const groupContainer = document.createElement("div");
+                    groupContainer.className = "month-shifts-group";
+
+                    group.items.forEach(itemObj => {
+                        const s = itemObj.shift;
+                        const idx = itemObj.originalIdx;
+
+                        const item = document.createElement("div");
+                        item.className = "shift-item";
+
+                        const isNight = isNightShift(s);
+                        const typeBadge = isNight
+                            ? "<span class='badge-type badge-night'>🌙 Ночь</span>"
+                            : "<span class='badge-type badge-day'>☀️ День</span>";
+
+                        const sideBadge = s.flpodr
+                            ? " <span class='badge-type' style='background:#E8F5E9; color:#2E7D32;'>💼 Подр</span>"
+                            : "";
+
+                        const perf = (s.plan > 0) ? Math.round((s.fact / s.plan) * 100) : 100;
+                        const ktuColor = perf >= 95 ? '#2E7D32' : (perf >= 90 ? '#F57F17' : '#D32F2F');
+
+                        item.innerHTML = `
+                            <div>
+                                <div class="shift-date">${s.date} ${typeBadge} ${sideBadge}</div>
+                                <div class="shift-details">Факт: ${Math.round(s.fact)} | План: ${Math.round(s.plan)} | КР ${s.kfrazr} | <b style="color:${ktuColor}; font-weight:800;">КТУ: ${perf}%</b></div>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <div class="shift-salary">${Math.round(s.salary)} ₽</div>
+                                <button style="border:none; background:none; cursor:pointer; font-size:16px;" onclick="event.stopPropagation(); deleteShift(${idx})">❌</button>
+                            </div>
+                        `;
+
+                        item.onclick = function() {
+                            editShift(idx);
+                        };
+
+                        groupContainer.appendChild(item);
+                    });
+
+                    container.appendChild(groupContainer);
+                }
+            });
+        }
+
+        function deleteShift(idx) {
+            if (confirm("Удалить смену за " + shifts[idx].date + "?")) {
+                shifts.splice(idx, 1);
+                localStorage.setItem("zpvyp_shifts", JSON.stringify(shifts));
+                updateDashboard();
+                renderReport();
+            }
+        }
+
+        function exportFullBackup() {
+            if (shifts.length === 0) {
+                alert("База смен пуста");
+                return;
+            }
+            const jsonStr = JSON.stringify({ version: 2, app: "ZPVyp_Backup", shifts: shifts }, null, 2);
+            const blob = new Blob([jsonStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `zpvyp_backup_${formatDate(new Date()).replace(/\./g, '_')}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            alert("💾 Резервная копия успешно сохранена в приложение «Файлы» вашего iPhone!");
+        }
+
+        function restoreFullBackup(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    const backupShifts = parsed.shifts || parsed;
+                    if (Array.isArray(backupShifts) && backupShifts.length > 0) {
+                        if (confirm(`Восстановить ${backupShifts.length} смен из резервной копии? Текущая база будет заменена.`)) {
+                            shifts = backupShifts;
+                            localStorage.setItem("zpvyp_shifts", JSON.stringify(shifts));
+                            updateDashboard();
+                            alert("✅ База смен успешно восстановлена из файла!");
+                            switchTab('tabReport');
+                        }
+                    } else {
+                        alert("Файл не содержит корректных смен");
+                    }
+                } catch(err) {
+                    alert("Ошибка при чтении файла резервной копии");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function handleFileSelected(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                try {
+                    const parsed = JSON.parse(content);
+                    if (parsed.shifts) {
+                        receivedModalShifts = parsed.shifts;
+                        openMultiShiftModal(parsed.shifts);
+                    } else if (parsed.date) {
+                        receivedModalShifts = [parsed];
+                        openMultiShiftModal([parsed]);
+                    } else {
+                        document.getElementById("importStatus").innerText = "📄 Текстовый файл прочтен: " + file.name;
+                    }
+                } catch(err) {
+                    document.getElementById("importStatus").innerText = "📄 Файл прочитан: " + file.name;
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function openMultiShiftModal(incomingShifts) {
+            const container = document.getElementById("modalShiftList");
+            container.innerHTML = "";
+
+            document.getElementById("modalTitle").innerText = "📥 Получено смен: 0";
+
+            incomingShifts.forEach((s, idx) => {
+                const isNight = isNightShift(s);
+                const row = document.createElement("label");
+                row.className = "checkbox-row";
+                row.innerHTML = `<input type="checkbox" class="modal-cb" data-idx="${idx}" checked> <span>${s.date} (${isNight ? '🌙 Ночь' : '☀️ День'}) • Факт: ${s.fact}</span>`;
+                container.appendChild(row);
+            });
+
+            document.getElementById("importModal").style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById("importModal").style.display = "none";
+        }
+
+        function saveSelectedModalShifts() {
+            const lastUserShift = shifts[0];
+            const userKfrazr = lastUserShift ? lastUserShift.kfrazr : 1.3;
+
+            const checkboxes = document.querySelectorAll(".modal-cb");
+            let importedCount = 0;
+
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    const idx = parseInt(cb.getAttribute("data-idx"));
+                    const s = receivedModalShifts[idx];
+
+                    const isNight = isNightShift(s);
+                    const perf = (s.plan > 0) ? (s.fact / s.plan) : 0;
+                    const effectivePerf = Math.max(0.8, perf);
+                    let salary = (s.stavlin || 3000) * userKfrazr * effectivePerf;
+                    if (s.flpodr) salary *= 1.3;
+
+                    const existingIdx = shifts.findIndex(item => item.date === s.date);
+                    const processedShift = {
+                        id: existingIdx !== -1 ? shifts[existingIdx].id : (Date.now() + idx),
+                        date: s.date,
+                        kfrazr: userKfrazr,
+                        stavlin: s.stavlin || 3000,
+                        plan: s.plan,
+                        fact: s.fact,
+                        flpodr: s.flpodr,
+                        isNight: isNight,
+                        salary: salary,
+                        comment: s.comment || ""
+                    };
+
+                    if (existingIdx !== -1) {
+                        shifts[existingIdx] = processedShift;
+                    } else {
+                        shifts.unshift(processedShift);
+                    }
+                    importedCount++;
+                }
+            });
+
+            localStorage.setItem("zpvyp_shifts", JSON.stringify(shifts));
+            updateDashboard();
+            closeModal();
+            alert(`✅ Успешно сохранено смен: ${importedCount} (с вашим коэффициентом разряда ${userKfrazr})!`);
+            switchTab('tabReport');
+        }
+
+        updateDashboard();
+    </script>
+</body>
+</html>
